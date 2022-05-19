@@ -1,0 +1,13 @@
+.imagem-visualizar {
+    margin: 5px;
+}
+
+.imagem-visualizar-img {
+    margin: 5px;
+    max-height: 400px;
+    max-width: 600px;
+}
+
+.imagem-visualizar-img-original {
+    margin: 5px;
+}
