@@ -1,0 +1,75 @@
+DROP DATABASE db_galeria;
+CREATE DATABASE db_galeria;
+USE db_galeria;
+
+CREATE TABLE tb_autor (
+    SK_autor_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    autor_nome varchar(512) NOT NULL,
+    autor_descricao varchar(1024)
+);
+
+CREATE TABLE tb_imagem (
+    SK_imagem_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    img_path varchar(1024) NOT NULL,
+    img_descricao varchar(512),
+    data_envio datetime,
+    FK_autor int NOT NULL,
+    FOREIGN KEY (FK_autor) REFERENCES tb_autor(SK_autor_id)
+);
+
+CREATE TABLE tb_tag (
+    SK_tag_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    FK_tag_id int,
+    tag varchar(128) NOT NULL,
+    FOREIGN KEY (FK_tag_id) REFERENCES tb_tag(SK_tag_id)
+);
+242
+65
+CREATE TABLE tb_imagemxtags (
+    FK_imagem_id int NOT NULL,
+    FK_tag_id int NOT NULL,
+    FOREIGN KEY (FK_imagem_id) REFERENCES tb_imagem(SK_imagem_id),
+    FOREIGN KEY (FK_tag_id) REFERENCES tb_tag(SK_tag_id)
+);
+
+-- Inserts obrigatórios
+INSERT INTO tb_autor(autor_nome, autor_descricao) VALUES ('Autor Desconhecido', 'Valor padrão para imagens cujo autor (ilustrador, fotógrafo, modelo, etc) é desconhecido.');
+
+INSERT INTO tb_tag(tag) VALUES ('Fotografia');
+INSERT INTO tb_tag(tag) VALUES ('Ilustração Analógica');
+INSERT INTO tb_tag(tag) VALUES ('Ilustração Digital');
+INSERT INTO tb_tag(tag) VALUES ('Ilustração');
+INSERT INTO tb_tag(tag) VALUES ('Pintura');
+INSERT INTO tb_tag(tag) VALUES ('Natureza');
+INSERT INTO tb_tag(tag) VALUES ('NFT (coisa de viado)');
+
+-- teste de imagens
+INSERT INTO tb_imagem (img_path, img_descricao, data_envio, FK_autor) VALUES ('/home/caminho', 'Imagem A', '2022-04-13', 1);
+INSERT INTO tb_imagem (img_path, img_descricao, data_envio, FK_autor) VALUES ('/home/caminho', 'Imagem B', '2022-04-13', 1);
+INSERT INTO tb_imagem (img_path, img_descricao, data_envio, FK_autor) VALUES ('/home/caminho', 'Imagem C', '2022-04-13', 1);
+INSERT INTO tb_imagem (img_path, img_descricao, data_envio, FK_autor) VALUES ('/home/caminho', 'Imagem D', '2022-04-13', 1);
+INSERT INTO tb_imagem (img_path, img_descricao, data_envio, FK_autor) VALUES ('/home/caminho', 'Imagem E', '2022-04-13', 1);
+
+INSERT INTO tb_imagemxtags (FK_imagem_id, FK_tag_id) VALUES (1, 1);
+INSERT INTO tb_imagemxtags (FK_imagem_id, FK_tag_id) VALUES (1, 2);
+INSERT INTO tb_imagemxtags (FK_imagem_id, FK_tag_id) VALUES (1, 3);
+INSERT INTO tb_imagemxtags (FK_imagem_id, FK_tag_id) VALUES (2, 3);
+INSERT INTO tb_imagemxtags (FK_imagem_id, FK_tag_id) VALUES (2, 4);
+INSERT INTO tb_imagemxtags (FK_imagem_id, FK_tag_id) VALUES (2, 5);
+INSERT INTO tb_imagemxtags (FK_imagem_id, FK_tag_id) VALUES (3, 5);
+INSERT INTO tb_imagemxtags (FK_imagem_id, FK_tag_id) VALUES (3, 6);
+INSERT INTO tb_imagemxtags (FK_imagem_id, FK_tag_id) VALUES (3, 7);
+INSERT INTO tb_imagemxtags (FK_imagem_id, FK_tag_id) VALUES (4, 1);
+INSERT INTO tb_imagemxtags (FK_imagem_id, FK_tag_id) VALUES (4, 3);
+INSERT INTO tb_imagemxtags (FK_imagem_id, FK_tag_id) VALUES (4, 6);
+INSERT INTO tb_imagemxtags (FK_imagem_id, FK_tag_id) VALUES (5, 2);
+INSERT INTO tb_imagemxtags (FK_imagem_id, FK_tag_id) VALUES (5, 4);
+INSERT INTO tb_imagemxtags (FK_imagem_id, FK_tag_id) VALUES (5, 7);
+
+
+
+-- Testar busca de imagens por tags em simultâneo
+-- Retorna todas as imagens que contenham as tags 3 e 5 juntas
+SELECT * FROM tb_imagem i INNER JOIN tb_imagemxtags it ON it.FK_imagem_id = i.SK_imagem_id
+WHERE it.FK_tag_id IN (3, 5) GROUP BY i.SK_imagem_id HAVING count(i.SK_imagem_id) = 2;
+-- Precisa indicar as primary keys das tags desejadas dentro de IN, e deve conter o número de tags pesquisadas em COUNT (neste caso, são duas, a tag 1 e a tag 5)
